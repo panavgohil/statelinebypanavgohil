@@ -64,8 +64,8 @@
   .week-row { display:flex; border-bottom:1px solid var(--border); padding:12px 0; align-items:center; } .week-row:last-child { border-bottom:none; } .week-day { width:100px; font-weight:600; color:#94a3b8; font-size:14px; } .week-subjects { flex:1; display:flex; flex-wrap:wrap; gap:8px; }
   .sub-tag { background:#334155; padding:4px 10px; border-radius:15px; font-size:12px; border:1px solid var(--border); font-weight: 500; } .sub-tag.long { border-color:#3b82f6; color:#bfdbfe; }
   
-  /* --- SCHEDULE BUTTONS (Compact P B A C R) --- */
-  .subject-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:15px; margin-top:20px; }
+  /* --- SCHEDULE BUTTONS (Updated to 6 Buttons) --- */
+  .subject-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:15px; margin-top:20px; }
   .sub-btn { background:#1e293b; color:white; padding:15px; border:1px solid var(--border); border-radius:12px; display:flex; flex-direction:column; gap:10px; min-height:100px; transition:0.2s; position:relative; overflow:hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); } .sub-btn:hover { background:#334155; border-color:var(--accent); transform: translateY(-2px); }
   .sub-btn.long { grid-column: span 1; background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border:1px solid #3b82f6; } .sub-btn.long::after { content:"2 HR"; position:absolute; top:10px; right:10px; font-size:10px; background:#3b82f6; padding:3px 6px; border-radius:4px; font-weight:700; letter-spacing: 0.5px; }
   
@@ -73,14 +73,15 @@
   .reorder-controls { display:flex; gap:2px; } 
   .move-btn { background:rgba(0,0,0,0.3); color:#94a3b8; padding:4px 8px; font-size:10px; border:1px solid var(--border); border-radius:6px; cursor:pointer; height:fit-content; transition: 0.2s; } .move-btn:hover { background:white; color:black; border-color: white; }
   
-  .actions { display:flex; gap:6px; margin-top:auto; } 
-  .act-btn { flex:1; padding:8px 0; font-size:12px; border-radius:8px; border:none; color:white; font-weight:600; cursor: pointer; transition: 0.2s; text-transform: uppercase; } 
+  .actions { display:flex; gap:5px; margin-top:auto; flex-wrap:wrap; } 
+  .act-btn { flex:1; padding:8px 0; font-size:12px; border-radius:8px; border:none; color:white; font-weight:700; cursor: pointer; transition: 0.2s; text-transform: uppercase; min-width: 40px; } 
   .act-btn:hover { opacity: 0.9; transform: scale(1.05); }
   
-  .bg-green { background:#16a34a; } .bg-red { background:#dc2626; } .bg-orange { background:#ea580c; } .bg-blue { background:#2563eb; } .bg-purple { background:#9333ea; }
+  .bg-green { background:#16a34a; } .bg-red { background:#dc2626; } .bg-orange { background:#ea580c; } 
+  .bg-blue { background:#2563eb; } .bg-cyan { background:#0891b2; } .bg-purple { background:#9333ea; }
   
   /* --- LEGEND --- */
-  .legend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .legend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
   .legend-item { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #cbd5e1; }
   .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
 
@@ -170,10 +171,11 @@
     <div class="card">
       <h3 style="font-size:14px; margin-bottom:15px;">Attendance Key</h3>
       <div class="legend-grid">
-        <div class="legend-item"><div class="legend-dot bg-green"></div> <span>P - Present</span></div>
+        <div class="legend-item"><div class="legend-dot bg-green"></div> <span>P - Attended</span></div>
         <div class="legend-item"><div class="legend-dot bg-red"></div> <span>B - Bunked</span></div>
         <div class="legend-item"><div class="legend-dot bg-orange"></div> <span>A - Absent</span></div>
-        <div class="legend-item"><div class="legend-dot bg-blue"></div> <span>C - Cancelled</span></div>
+        <div class="legend-item"><div class="legend-dot bg-blue"></div> <span>CT - Cancelled by Teacher</span></div>
+        <div class="legend-item"><div class="legend-dot bg-cyan"></div> <span>CR - Cancelled by CR</span></div>
         <div class="legend-item"><div class="legend-dot bg-purple"></div> <span>R - Rescheduled</span></div>
       </div>
     </div>
@@ -249,7 +251,7 @@ async function updateProfile() {
 function syncSchedule() { document.getElementById("syncStatus").innerHTML = "<span>Syncing...</span>"; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ type: "save-schedule", roll: roll, schedule: JSON.stringify(mySchedule) }) }).then(r=>r.json()).then(res=>{ document.getElementById("syncStatus").innerHTML = res.status==="success" ? "<span style='color:#86efac'>Saved ✔</span>" : "<span style='color:#fca5a5'>Error ⚠</span>"; }); }
 async function sendData(day, subject, status, remark, weight, dateOverride) { const toast = document.getElementById("toast"); toast.innerText = "Saving..."; toast.style.display = "block"; try { const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ name: user, roll: roll, date: dateOverride ? new Date(dateOverride).toLocaleDateString() : new Date().toLocaleDateString(), day: day, subject: subject, status: status, remark: remark, weight: parseInt(weight) }) }); const data = await res.json(); if(data.status === "success") { toast.innerText = "Saved!"; await fetchStats(); setTimeout(() => toast.style.display="none", 2000); } else throw new Error(data.message); } catch(e) { toast.innerText = "Error!"; setTimeout(() => toast.style.display="none", 3000); } }
 
-// REVERTED: Buttons are back to single letters P, B, A, C, R
+// UPDATED: Buttons now use Initials (P, B, A, CT, CR, R) mapping to full statuses
 function renderSchedule() { 
   const container = document.getElementById("subjectList"); container.innerHTML = ""; 
   const subjects = mySchedule[today] || []; 
@@ -265,11 +267,12 @@ function renderSchedule() {
             <div class="reorder-controls">${showUp}${showDown}</div>
           </div>
           <div class="actions">
-            <button class="act-btn bg-green" onclick="mark('${sub.name}','Attended',${sub.duration})">P</button>
-            <button class="act-btn bg-red" onclick="mark('${sub.name}','Bunked',${sub.duration})">B</button>
-            <button class="act-btn bg-orange" onclick="mark('${sub.name}','Absent',${sub.duration})">A</button>
-            <button class="act-btn bg-blue" onclick="mark('${sub.name}','Cancelled',0)">C</button>
-            <button class="act-btn bg-purple" onclick="mark('${sub.name}','Rescheduled',${sub.duration},'Rescheduled')">R</button>
+            <button class="act-btn bg-green" title="Attended" onclick="mark('${sub.name}','Attended',${sub.duration})">P</button>
+            <button class="act-btn bg-red" title="Bunked" onclick="mark('${sub.name}','Bunked',${sub.duration})">B</button>
+            <button class="act-btn bg-orange" title="Absent" onclick="mark('${sub.name}','Absent',${sub.duration})">A</button>
+            <button class="act-btn bg-blue" title="Cancelled by Teacher" onclick="mark('${sub.name}','Cancelled by Teacher',0)">CT</button>
+            <button class="act-btn bg-cyan" title="Cancelled by CR" onclick="mark('${sub.name}','Cancelled by CR',0)">CR</button>
+            <button class="act-btn bg-purple" title="Rescheduled" onclick="mark('${sub.name}','Rescheduled',${sub.duration},'Rescheduled')">R</button>
           </div>
         </div>`; 
       container.innerHTML += html; 
